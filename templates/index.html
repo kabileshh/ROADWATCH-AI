@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoadWatch AI // Smart City Infrastructure OS</title>
+    
+    <!-- Google Fonts: Futuristic Outfit & Rajdhani -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Leaflet.js (Map Library) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <!-- Chart.js (Data Analytics) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Core Application CSS -->
+    <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body class="futuristic-hud">
+    <!-- Grid System Overlay Background -->
+    <div class="hud-grid-overlay"></div>
+    <div class="hud-scanlines"></div>
+
+    <!-- Main OS Container -->
+    <div class="hud-container">
+        
+        <!-- SIDEBAR NAVIGATION PANEL -->
+        <aside class="hud-sidebar glass-panel">
+            <div class="sidebar-logo">
+                <div class="logo-icon-glowing">
+                    <i class="fa-solid fa-radar pulse-animation"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>ROADWATCH AI</h1>
+                    <span class="version-tag">SYSTEM v40.8.2</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item active" data-tab="dashboard">
+                        <i class="fa-solid fa-gauge-high"></i>
+                        <span>Dashboard</span>
+                    </li>
+                    <li class="nav-item" data-tab="map-view">
+                        <i class="fa-solid fa-map-location-dot"></i>
+                        <span>Road Monitor Map</span>
+                    </li>
+                    <li class="nav-item" data-tab="report-view">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span>Report Issue</span>
+                    </li>
+                    <li class="nav-item" data-tab="chat-view">
+                        <i class="fa-solid fa-headset"></i>
+                        <span>AI Assistant</span>
+                    </li>
+                </ul>
+            </nav>
+            
+            <!-- SYSTEM DIAGNOSTIC FOOTER -->
+            <div class="sidebar-system-diagnostics">
+                <div class="diag-header">
+                    <span>SYSTEM DIAGNOSTICS</span>
+                    <span class="status-online"><i class="fa-solid fa-circle"></i> ONLINE</span>
+                </div>
+                <div class="diag-item">
+                    <span>AI SUB-CORE</span>
+                    <span class="value" id="diag-ai-load">ACTIVE // 0.04s</span>
+                </div>
+                <div class="diag-item">
+                    <span>DATABASE SYNC</span>
+                    <span class="value text-cyan">SECURE SQLITE</span>
+                </div>
+                <div class="diag-item">
+                    <span>NODE LATENCY</span>
+                    <span class="value" id="diag-latency">12 ms</span>
+                </div>
+                <div class="telemetry-bar">
+                    <div class="telemetry-progress" style="width: 72%;"></div>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- MAIN CONTENT HUD AREA -->
+        <main class="hud-main">
+            <!-- TOP BAR STATUS HUD -->
+            <header class="hud-topbar glass-panel">
+                <div class="topbar-left">
+                    <span class="system-tag"><i class="fa-solid fa-server"></i> CHENNAI_NODE_SEC // LEVEL 1 TRANSPARENCY</span>
+                    <div class="ticker-wrap">
+                        <div class="ticker" id="notification-ticker">
+                            Initializing system components... AI detection layers ready... Citizen logs active.
+                        </div>
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <div class="date-time-hud">
+                        <span class="label">UTC_SYNC</span>
+                        <span class="value" id="hud-clock">2040-05-24 18:00:00</span>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- TAB PANES CONTAINER -->
+            <div class="hud-content-panes">
+                
+                <!-- TAB 1: TRANSPARENCY DASHBOARD -->
+                <section class="hud-tab-pane active" id="pane-dashboard">
+                    <div class="dashboard-grid">
+                        
+                        <!-- ROW 1: KINETIC COUNTER CARDS -->
+                        <div class="stats-row">
+                            <div class="stat-card glass-panel glow-cyan">
+                                <div class="stat-icon"><i class="fa-solid fa-shield-halved text-cyan"></i></div>
+                                <div class="stat-data">
+                                    <span class="stat-label">AVERAGE ROAD HEALTH</span>
+                                    <h2 class="stat-value" id="dash-avg-health">--%</h2>
+                                    <span class="stat-sub text-cyan">Overall Integrity Index</span>
+                                </div>
+                            </div>
+                            <div class="stat-card glass-panel glow-orange">
+                                <div class="stat-icon"><i class="fa-solid fa-triangle-exclamation text-orange"></i></div>
+                                <div class="stat-data">
+                                    <span class="stat-label">ACTIVE COMPLAINTS</span>
+                                    <h2 class="stat-value" id="dash-total-complaints">--</h2>
+                                    <span class="stat-sub text-orange" id="dash-pending-routing">-- in dispatch routing</span>
+                                </div>
+                            </div>
+                            <div class="stat-card glass-panel glow-green">
+                                <div class="stat-icon"><i class="fa-solid fa-hand-holding-dollar text-green"></i></div>
+                                <div class="stat-data">
+                                    <span class="stat-label">BUDGET UTILIZED</span>
+                                    <h2 class="stat-value" id="dash-budget-util">--%</h2>
+                                    <span class="stat-sub text-green" id="dash-total-budget">Allocated: --</span>
+                                </div>
+                            </div>
+                            <div class="stat-card glass-panel glow-red">
+                                <div class="stat-icon"><i class="fa-solid fa-bell-exclamation text-red pulse-animation"></i></div>
+                                <div class="stat-data">
+                                    <span class="stat-label">AI ALERT FLAGS</span>
+                                    <h2 class="stat-value text-red" id="dash-ai-alerts">--</h2>
+                                    <span class="stat-sub text-red">High Urgency Diagnostics</span>
+                                </div>
+                            </div>
+                            <div class="stat-card glass-panel glow-blue">
+                                <div class="stat-icon"><i class="fa-solid fa-users text-cyan"></i></div>
+                                <div class="stat-data">
+                                    <span class="stat-label">CITIZEN REPORTS</span>
+                                    <h2 class="stat-value" id="dash-citizen-reports">--</h2>
+                                    <span class="stat-sub text-cyan">Total Registered Tickets</span>
+                                </div>
+                            </div>
+                            <div class="stat-card glass-panel glow-yellow">
+                                <div class="stat-icon"><i class="fa-solid fa-helmet-safety text-yellow"></i></div>
+                                <div class="stat-data">
+                                    <span class="stat-label">REPAIR OPERATIONS</span>
+                                    <h2 class="stat-value" id="dash-repair-operations">--</h2>
+                                    <span class="stat-sub text-yellow">Crews Active On-Site</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- ROW 2: ANALYTICS CHARTS -->
+                        <div class="charts-row">
+                            <div class="chart-card glass-panel">
+                                <div class="card-header">
+                                    <h3><i class="fa-solid fa-chart-line text-cyan"></i> CITIZEN COMPLAINT DISTRIBUTION</h3>
+                                    <span class="panel-decor"></span>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="complaintsChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="chart-card glass-panel">
+                                <div class="card-header">
+                                    <h3><i class="fa-solid fa-chart-pie text-orange"></i> BUDGET ALLOCATION BY ROAD</h3>
+                                    <span class="panel-decor"></span>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="budgetChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- ROW 3: DETAILED TABLES & TELEMETRY TERMINAL -->
+                        <div class="details-row">
+                            <div class="dashboard-row-three">
+                                <div class="table-card glass-panel">
+                                    <div class="card-header">
+                                        <h3><i class="fa-solid fa-list-check text-cyan"></i> REAL-TIME INFRASTRUCTURE REGISTRY</h3>
+                                        <span class="panel-decor"></span>
+                                    </div>
+                                    <div class="table-wrapper">
+                                        <table class="hud-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>ROADWAY</th>
+                                                    <th>CONTRACTOR</th>
+                                                    <th>ALLOCATED BUDGET</th>
+                                                    <th>FUNDS SPENT</th>
+                                                    <th>HEALTH</th>
+                                                    <th>CONDITION</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="dashboard-roads-tbody">
+                                                <!-- Loaded dynamically -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                
+                                <div class="system-logs-card glass-panel">
+                                    <div class="card-header">
+                                        <h3><i class="fa-solid fa-satellite text-orange"></i> REAL-TIME ACTIVITY TELEMETRY FEED</h3>
+                                        <span class="panel-decor-active"></span>
+                                    </div>
+                                    <div class="system-log-terminal" id="system-log-terminal">
+                                        <div class="log-line text-muted">[18:00:00] [SYSTEM] Telemetry link established. Level 1 Audit running...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </section>
+                
+                <!-- TAB 2: ROAD MONITORING MAP -->
+                <section class="hud-tab-pane" id="pane-map-view">
+                    <div class="map-layout-wrapper">
+                        <!-- Left Panel: Interactive Leaflet Map -->
+                        <div class="map-container-panel glass-panel">
+                            <div id="map"></div>
+                            
+                            <!-- Floating Map Legend -->
+                            <div class="map-legend-panel glass-panel">
+                                <h4>CONDITION STATUS</h4>
+                                <div class="legend-item"><span class="legend-line color-optimal"></span> Optimal (75-100)</div>
+                                <div class="legend-item"><span class="legend-line color-fair"></span> Fair (40-74)</div>
+                                <div class="legend-item"><span class="legend-line color-critical"></span> Critical (0-39)</div>
+                                <div class="legend-item"><span class="legend-marker bg-cyan pulse"></span> Active Citizen Report</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Right Panel: Click Details Drawer -->
+                        <div class="map-details-sidebar glass-panel" id="map-road-detail-panel">
+                            <div class="detail-placeholder" id="road-detail-placeholder">
+                                <i class="fa-solid fa-compass-drafting pulse-animation"></i>
+                                <h3>SELECT ROADWAY SEGMENT</h3>
+                                <p>Click on any glowing road path on the telemetry map to analyze constructor details, real-time budgets, and active civic issues.</p>
+                            </div>
+                            
+                            <div class="detail-content hidden" id="road-detail-content">
+                                <div class="card-header">
+                                    <h3 id="detail-road-name">Anna Salai</h3>
+                                    <span class="panel-decor-active"></span>
+                                </div>
+                                
+                                <div class="detail-grid-two">
+                                    <div class="detail-section no-margin">
+                                        <div class="detail-label">OPERATING CONTRACTOR</div>
+                                        <div class="detail-value text-cyan" id="detail-contractor">Navayuga Engineering</div>
+                                    </div>
+                                    <div class="detail-section no-margin">
+                                        <div class="detail-label">STATUS CATEGORY</div>
+                                        <div class="detail-value status-pill" id="detail-condition">OPTIMAL</div>
+                                    </div>
+                                </div>
+
+                                <div class="detail-grid">
+                                    <div class="detail-cell dial-cell">
+                                        <div class="detail-label">AI RISK RATING</div>
+                                        <div class="risk-dial-container">
+                                            <canvas id="risk-gauge-canvas" width="80" height="80"></canvas>
+                                            <div class="risk-dial-value" id="detail-risk-score">--%</div>
+                                        </div>
+                                    </div>
+                                    <div class="detail-cell">
+                                        <div class="detail-label">HEALTH INTEGRITY</div>
+                                        <div class="detail-value text-large" id="detail-health">85%</div>
+                                        <div class="detail-sub-label" id="detail-health-sub">NOMINAL INTEGRITY</div>
+                                    </div>
+                                </div>
+
+                                <div class="detail-section profile-box">
+                                    <div class="diag-title-small">AI PREDICTIVE RISK PROFILE</div>
+                                    <div class="diag-line-small">
+                                        <span>Contractor Reliability:</span>
+                                        <span class="value text-cyan" id="detail-contractor-rating">--%</span>
+                                    </div>
+                                    <div class="diag-line-small">
+                                        <span>Failure Recurrence:</span>
+                                        <span class="value text-orange" id="detail-failure-history">--</span>
+                                    </div>
+                                    <div class="diag-line-small">
+                                        <span>Deterioration Slope:</span>
+                                        <span class="value" id="detail-degradation-rate">--</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-section">
+                                    <div class="detail-label">FINANCIAL TRANSPARENCY</div>
+                                    <div class="budget-bar-wrap">
+                                        <div class="budget-label">
+                                            <span>Allocated: <b id="detail-budget">₹--</b></span>
+                                            <span>Spent: <b id="detail-spent">₹--</b></span>
+                                        </div>
+                                        <div class="budget-bar-track">
+                                            <div class="budget-bar-fill" id="detail-budget-fill" style="width: 0%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="detail-section">
+                                    <div class="detail-label">12-MONTH SEGMENT TREND</div>
+                                    <div class="sparkline-container">
+                                        <canvas id="road-sparkline-canvas" width="340" height="50"></canvas>
+                                    </div>
+                                </div>
+
+                                <div class="detail-section">
+                                    <div class="detail-label">LAST MAINTENANCE CYCLE</div>
+                                    <div class="detail-value" id="detail-repair-date">2040-02-15</div>
+                                </div>
+
+                                <div class="detail-section">
+                                    <div class="detail-label">ACTIVE CITIZEN COMPLAINTS</div>
+                                    <div class="complaints-timeline" id="detail-complaints-list">
+                                        <!-- Loaded dynamically -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- TAB 3: SMART COMPLAINT REPORTING -->
+                <section class="hud-tab-pane" id="pane-report-view">
+                    <div class="reporting-layout">
+                        
+                        <!-- LEFT FORM PANEL -->
+                        <div class="report-form-panel glass-panel">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-file-invoice text-orange"></i> INFRASTRUCTURE ANOMALY REPORT</h3>
+                                <span class="panel-decor"></span>
+                            </div>
+                            
+                            <form id="complaint-form" class="hud-form">
+                                <div class="form-group">
+                                    <label class="form-label">1. VISUAL EVIDENCE SCAN (Drag & Drop Image)</label>
+                                    <div class="drag-drop-zone" id="image-drag-zone">
+                                        <input type="file" id="image-input" accept="image/*" class="hidden-input">
+                                        <div class="zone-prompt">
+                                            <i class="fa-solid fa-cloud-arrow-up text-cyan"></i>
+                                            <p>DRAG DAMAGE VISUAL EVIDENCE HERE</p>
+                                            <span>or click to browse local terminal files</span>
+                                        </div>
+                                        <div class="zone-preview hidden" id="image-preview-container">
+                                            <img src="" id="selected-image-preview">
+                                            <div class="preview-overlay">
+                                                <i class="fa-solid fa-circle-check text-green"></i> FILE_LOADED
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">2. ANOMALY DESCRIPTION</label>
+                                    <textarea class="hud-textarea" id="report-description" placeholder="Describe the road damage, specific hazards, or size coordinates..." required></textarea>
+                                </div>
+                                
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">LATITUDE COORDINATE</label>
+                                        <input type="number" step="any" class="hud-input" id="report-lat" placeholder="13.0827" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">LONGITUDE COORDINATE</label>
+                                        <input type="number" step="any" class="hud-input" id="report-lng" placeholder="80.2707" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="helper-text-alert text-orange">
+                                    <i class="fa-solid fa-map-pin"></i> TIP: Double-click any position on the <b>Road Monitor Map</b> tab to automatically lock coordinates.
+                                </div>
+                                
+                                <button type="submit" class="hud-btn-primary glow-orange" id="btn-submit-complaint">
+                                    <i class="fa-solid fa-shield-virus"></i> INITIALIZE COMPLAINT ROUTING
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <!-- RIGHT DETECTOR DISPLAY PANEL -->
+                        <div class="report-ai-detector-panel glass-panel">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-microchip text-cyan"></i> ROADWATCH AI DAMAGE CLASSIFIER</h3>
+                                <span class="panel-decor"></span>
+                            </div>
+                            
+                            <div class="detector-viewport">
+                                <!-- Holographic Scanning Canvas -->
+                                <div class="scanning-wrapper" id="scanner-wrapper">
+                                    <div class="scan-overlay-bar hidden" id="scan-overlay-bar"></div>
+                                    <canvas id="detection-canvas" width="640" height="480"></canvas>
+                                    <div class="viewport-placeholder" id="viewport-placeholder">
+                                        <i class="fa-solid fa-image-portrait pulse-animation"></i>
+                                        <p>AWAITING EVIDENCE SIGNAL...</p>
+                                        <span>Upload an image to start visual AI parsing.</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- AI Diagnostics Readout -->
+                                <div class="ai-diagnostics-readout">
+                                    <div class="diagnostic-title">CLASSIFICATION METRICS // 2040 CORE</div>
+                                    
+                                    <div class="diag-line">
+                                        <span>DAMAGE IDENTIFIED:</span>
+                                        <span class="value text-cyan" id="ai-diag-type">N/A</span>
+                                    </div>
+                                    <div class="diag-line">
+                                        <span>DETECTION CONFIDENCE:</span>
+                                        <span class="value text-orange" id="ai-diag-conf">0.0%</span>
+                                    </div>
+                                    <div class="diag-line">
+                                        <span>SEVERITY INDEX:</span>
+                                        <span class="value" id="ai-diag-severity">N/A</span>
+                                    </div>
+                                    
+                                    <!-- Dynamic Routing Log HUD -->
+                                    <div class="dynamic-routing-hud hidden" id="dynamic-routing-hud">
+                                        <div class="routing-hud-title">AUTOMATED CIVIC DISPATCH ROUTING</div>
+                                        <div class="routing-steps">
+                                            <div class="routing-step active" id="routing-step-1">
+                                                <div class="step-bullet"></div>
+                                                <div class="step-body">
+                                                    <span class="step-title">AI SCANNER ENGINE</span>
+                                                    <span class="step-desc">Identifying structure coordinates</span>
+                                                </div>
+                                            </div>
+                                            <div class="routing-step" id="routing-step-2">
+                                                <div class="step-bullet"></div>
+                                                <div class="step-body">
+                                                    <span class="step-title">MUNICIPAL ZONE GATEWAY</span>
+                                                    <span class="step-desc" id="routing-zone-desc">Resolving nearest boundary</span>
+                                                </div>
+                                            </div>
+                                            <div class="routing-step" id="routing-step-3">
+                                                <div class="step-bullet"></div>
+                                                <div class="step-body">
+                                                    <span class="step-title">CIVIC TASK FORCE</span>
+                                                    <span class="step-desc" id="routing-engineer-desc">Assigning lead contractor</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </section>
+                
+                <!-- TAB 4: AI COMMAND CONSOLE -->
+                <section class="hud-tab-pane" id="pane-chat-view">
+                    <div class="chat-console-wrapper">
+                        
+                        <!-- LEFT SUGGESTIONS PANEL -->
+                        <div class="chat-presets-panel glass-panel">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-terminal text-cyan"></i> SYSTEM PRESET QUERIES</h3>
+                                <span class="panel-decor"></span>
+                            </div>
+                            <div class="presets-list">
+                                <button class="preset-btn" data-query="Who maintains Poonamallee High Road?">
+                                    <i class="fa-solid fa-chevron-right"></i> Who maintains Poonamallee High Road?
+                                </button>
+                                <button class="preset-btn" data-query="What is the budget allocated for Rajiv Gandhi Salai (OMR)?">
+                                    <i class="fa-solid fa-chevron-right"></i> What is the budget for OMR?
+                                </button>
+                                <button class="preset-btn" data-query="Which roads have critical damage?">
+                                    <i class="fa-solid fa-chevron-right"></i> List critical roads
+                                </button>
+                                <button class="preset-btn" data-query="What is the health score of Velachery Main Road?">
+                                    <i class="fa-solid fa-chevron-right"></i> Velachery Main Road health
+                                </button>
+                                <button class="preset-btn" data-query="Give me a budget transparency breakdown.">
+                                    <i class="fa-solid fa-chevron-right"></i> Global budget transparency
+                                </button>
+                            </div>
+                            
+                            <div class="chat-system-status glass-panel">
+                                <div class="diag-header"><i class="fa-solid fa-dna text-cyan"></i> AI ENGINE TELEMETRY</div>
+                                <p>Running 2040 Municipal LLM. Interface is database-aware, cross-referencing live SQLite tables with prompt contexts.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- MAIN CONSOLE INTERFACE -->
+                        <div class="chat-interface-panel glass-panel">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-comments text-cyan"></i> ROADWATCH CORE AI CONSOLE</h3>
+                                <span class="panel-decor"></span>
+                            </div>
+                            
+                            <!-- Console Log Terminal -->
+                            <div class="console-chat-box" id="console-chat-box">
+                                <div class="chat-bubble bot-bubble">
+                                    <div class="bubble-meta"><span class="sender-name">CORE_AI v40.8</span> <span class="bubble-time">SYSTEM_INIT</span></div>
+                                    <div class="bubble-text">
+                                        Greetings, Citizen. Systems online. Ready to address road quality indices, contractor transparency registers, or complaint routing logs. Type a custom query or select a preset to analyze.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Form input line -->
+                            <form id="chat-form" class="hud-chat-input-form">
+                                <div class="input-glow-wrapper">
+                                    <input type="text" class="hud-chat-input" id="chat-input-message" placeholder="Input system query command..." required autocomplete="off">
+                                    <button type="submit" class="chat-submit-btn">
+                                        <i class="fa-solid fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+                
+            </div>
+        </main>
+    </div>
+
+    <!-- Alert Modal popup for messages -->
+    <div id="system-toast" class="system-toast hidden">
+        <div class="toast-content">
+            <i class="fa-solid fa-circle-info text-cyan" id="toast-icon"></i>
+            <span id="toast-message">Telemetry connection locked.</span>
+        </div>
+    </div>
+
+    <!-- FLOATING AI INSIGHTS OVERLAY -->
+    <div class="floating-ai-insights glass-panel" id="floating-ai-insights">
+        <div class="insight-header">
+            <span class="insight-title"><i class="fa-solid fa-microchip text-orange pulse-animation"></i> CORE_AI // SMART INSIGHT</span>
+            <span class="insight-close" onclick="document.getElementById('floating-ai-insights').classList.add('hidden')">&times;</span>
+        </div>
+        <div class="insight-body" id="insight-body-text">
+            Performing neural infrastructure diagnostics... Core AI active.
+        </div>
+        <div class="insight-footer">
+            <span class="pulse-dot"></span> REAL-TIME TELEMETRY SCAN
+        </div>
+    </div>
+
+    <!-- Application scripts -->
+    <script src="/static/js/app.js"></script>
+    <script src="/static/js/map.js"></script>
+    <script src="/static/js/dashboard.js"></script>
+    <script src="/static/js/detection.js"></script>
+    <script src="/static/js/reporter.js"></script>
+    <script src="/static/js/chatbot.js"></script>
+</body>
+</html>
